@@ -4,11 +4,15 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "Action": {
+    "actions": {
       "model": "Action",
       "namespace": "public"
     },
-    "User": {
+    "registrations": {
+      "model": "Registration",
+      "namespace": "public"
+    },
+    "users": {
       "model": "User",
       "namespace": "public"
     }
@@ -19,6 +23,13 @@
         "models": {
           "Action": {
             "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "description": {
                 "nullable": false,
                 "type": {
@@ -55,10 +66,24 @@
                   "kind": "scalar"
                 }
               },
+              "organizerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "title": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
               },
@@ -70,9 +95,44 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "organizer": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "organizerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "registrations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actionId"
+                  ]
+                },
+                "to": {
+                  "model": "Registration",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
+                "createdAt": {
+                  "column": "created_at"
+                },
                 "description": {
                   "column": "description"
                 },
@@ -80,7 +140,7 @@
                   "column": "docs"
                 },
                 "eventDate": {
-                  "column": "eventDate"
+                  "column": "event_date"
                 },
                 "id": {
                   "column": "id"
@@ -88,15 +148,125 @@
                 "location": {
                   "column": "location"
                 },
+                "organizerId": {
+                  "column": "organizer_id"
+                },
                 "title": {
                   "column": "title"
+                },
+                "updatedAt": {
+                  "column": "updated_at"
                 },
                 "vacancies": {
                   "column": "vacancies"
                 }
               },
               "namespaceId": "public",
-              "table": "Action"
+              "table": "actions"
+            }
+          },
+          "Registration": {
+            "fields": {
+              "actionId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "action": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "actionId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Action",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actionId": {
+                  "column": "action_id"
+                },
+                "createdAt": {
+                  "column": "created_at"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updated_at"
+                },
+                "userId": {
+                  "column": "user_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "registrations"
             }
           },
           "User": {
@@ -151,11 +321,42 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "actions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "organizerId"
+                  ]
+                },
+                "to": {
+                  "model": "Action",
+                  "namespace": "public"
+                }
+              },
+              "registrations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "Registration",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "createdAt": {
-                  "column": "createdAt"
+                  "column": "created_at"
                 },
                 "email": {
                   "column": "email"
@@ -173,11 +374,11 @@
                   "column": "role"
                 },
                 "updatedAt": {
-                  "column": "updatedAt"
+                  "column": "updated_at"
                 }
               },
               "namespaceId": "public",
-              "table": "User"
+              "table": "users"
             }
           }
         }
@@ -189,15 +390,31 @@
       "public": {
         "entries": {
           "table": {
-            "Action": {
+            "actions": {
               "checks": [
                 {
-                  "expression": "array_position(\"docs\", NULL) IS NULL",
-                  "name": "Action_docs_elem_not_null_3ecbeb56",
-                  "prefix": "Action_docs_elem_not_null"
+                  "expression": "(array_position(docs, NULL::text) IS NULL)",
+                  "name": "actions_docs_no_nulls"
+                },
+                {
+                  "expression": "(length(TRIM(BOTH FROM title)) > 0)",
+                  "name": "actions_title_not_blank"
+                },
+                {
+                  "expression": "(vacancies > 0)",
+                  "name": "actions_vacancies_positive"
                 }
               ],
               "columns": {
+                "created_at": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
                 "description": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -205,11 +422,18 @@
                 },
                 "docs": {
                   "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": []
+                  },
                   "many": true,
                   "nativeType": "text",
+                  "noCheck": [
+                    "elementNotNull"
+                  ],
                   "nullable": false
                 },
-                "eventDate": {
+                "event_date": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
@@ -228,9 +452,23 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "organizer_id": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "title": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
+                  "nullable": false
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "vacancies": {
@@ -239,18 +477,185 @@
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "name": "actions_organizer_id_fkey",
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "organizer_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "actions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "event_date"
+                  ],
+                  "name": "actions_event_date_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "organizer_id"
+                  ],
+                  "name": "actions_organizer_id_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
-                ]
+                ],
+                "name": "actions_pkey"
               },
               "uniques": []
             },
-            "User": {
+            "registrations": {
+              "checks": [
+                {
+                  "expression": "(status = ANY (ARRAY['confirmada'::text, 'cancelada'::text]))",
+                  "name": "registrations_status_valid"
+                }
+              ],
               "columns": {
-                "createdAt": {
+                "action_id": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "confirmada"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "user_id": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "registrations_action_id_fkey",
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "action_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "registrations"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "actions"
+                  }
+                },
+                {
+                  "name": "registrations_user_id_fkey",
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "user_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "registrations"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "action_id"
+                  ],
+                  "name": "registrations_action_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "registrations_pkey"
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "user_id",
+                    "action_id"
+                  ],
+                  "name": "registrations_user_action_key"
+                }
+              ]
+            },
+            "users": {
+              "checks": [
+                {
+                  "expression": "(email ~* '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'::text)",
+                  "name": "users_email_format"
+                },
+                {
+                  "expression": "(length(TRIM(BOTH FROM name)) > 0)",
+                  "name": "users_name_not_blank"
+                },
+                {
+                  "expression": "(role = ANY (ARRAY['Morador'::text, 'Organizador'::text]))",
+                  "name": "users_role_valid"
+                }
+              ],
+              "columns": {
+                "created_at": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
                     "expression": "now()",
@@ -288,8 +693,12 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "updatedAt": {
+                "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
                   "nativeType": "timestamptz",
                   "nullable": false
                 }
@@ -299,13 +708,15 @@
               "primaryKey": {
                 "columns": [
                   "id"
-                ]
+                ],
+                "name": "users_pkey"
               },
               "uniques": [
                 {
                   "columns": [
                     "email"
-                  ]
+                  ],
+                  "name": "users_email_key"
                 }
               ]
             }
@@ -315,29 +726,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "2e5d3c9ca54b1cf594de8128f309dcdfa55a55fd4ae29f481eb220ccae96010b"
-  },
-  "execution": {
-    "executionHash": "69093ab7e4a04aae250d90d877829502ed1b6464d0f6475e5adfe61909e2fcdb",
-    "mutations": {
-      "defaults": [
-        {
-          "onCreate": {
-            "id": "timestampNow",
-            "kind": "generator"
-          },
-          "onUpdate": {
-            "id": "timestampNow",
-            "kind": "generator"
-          },
-          "ref": {
-            "column": "updatedAt",
-            "namespace": "public",
-            "table": "User"
-          }
-        }
-      ]
-    }
+    "storageHash": "5f501ac138dbd15feab4f57d363b397cb067b289a145ad9ff323f5faffe12c70"
   },
   "capabilities": {
     "postgres": {

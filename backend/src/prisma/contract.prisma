@@ -1,33 +1,58 @@
 // use prisma-8
+// Contrato inferido de database/schema.sql (fonte da verdade do esquema).
+// Após alterar o schema.sql: aplicar no banco, `prisma contract infer`, ajustar nomes, `contract emit` e `db sign`.
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+  id            Int             @id(map: "users_pkey") @default(autoincrement())
+  name          String
+  email         String          @unique(map: "users_email_key")
+  password      String
+  role          String
+  createdAt     TimestamptzString     @default(now()) @map("created_at")
+  updatedAt     TimestamptzString     @default(now()) @map("updated_at")
+  actions       Action[]
+  registrations Registration[]
+
+  @@check(expression: "(email ~* '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'::text)", map: "users_email_format")
+  @@check(expression: "(length(TRIM(BOTH FROM name)) > 0)", map: "users_name_not_blank")
+  @@check(expression: "(role = ANY (ARRAY['Morador'::text, 'Organizador'::text]))", map: "users_role_valid")
+  @@map("users")
 }
 
-// model Post {
-//   id        Int      @id @default(autoincrement())
-//   title     String
-//   content   String?
-//   author    User     @relation(fields: [authorId], references: [id])
-//   authorId  Int
-//   createdAt TimestamptzString @default(now())
-//   updatedAt temporal.updatedAtString()
-// }
-
 model Action {
-  id Int @id @default(autoincrement())
-  title String
-  description String
-  location String
-  eventDate TimestamptzString
-  vacancies Int
-  docs String[]
+  id            Int             @id(map: "actions_pkey") @default(autoincrement())
+  organizerId   Int             @map("organizer_id")
+  title         String
+  description   String
+  location      String
+  eventDate     TimestamptzString     @map("event_date")
+  vacancies     Int
+  docs          String[]        @default([]) @noCheck(elementNotNull)
+  createdAt     TimestamptzString     @default(now()) @map("created_at")
+  updatedAt     TimestamptzString     @default(now()) @map("updated_at")
+  registrations Registration[]
+  organizer     User           @relation(fields: [organizerId], references: [id], onDelete: Cascade, map: "actions_organizer_id_fkey")
 
+  @@index([eventDate], map: "actions_event_date_idx")
+  @@index([organizerId], map: "actions_organizer_id_idx")
+  @@check(expression: "(array_position(docs, NULL::text) IS NULL)", map: "actions_docs_no_nulls")
+  @@check(expression: "(length(TRIM(BOTH FROM title)) > 0)", map: "actions_title_not_blank")
+  @@check(expression: "(vacancies > 0)", map: "actions_vacancies_positive")
+  @@map("actions")
+}
 
+model Registration {
+  id        Int         @id(map: "registrations_pkey") @default(autoincrement())
+  userId    Int         @map("user_id")
+  actionId  Int         @map("action_id")
+  status    String      @default("confirmada")
+  createdAt TimestamptzString @default(now()) @map("created_at")
+  updatedAt TimestamptzString @default(now()) @map("updated_at")
+  action    Action     @relation(fields: [actionId], references: [id], onDelete: Cascade, map: "registrations_action_id_fkey")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "registrations_user_id_fkey", index: false)
+
+  @@unique([userId, actionId], map: "registrations_user_action_key")
+  @@index([actionId], map: "registrations_action_id_idx")
+  @@check(expression: "(status = ANY (ARRAY['confirmada'::text, 'cancelada'::text]))", map: "registrations_status_valid")
+  @@map("registrations")
 }
