@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ActionService } from './action/action.service';
-import { ActionController } from './action/action.controller';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { ActionService } from './action/action.service.js';
+import { ActionController } from './action/action.controller.js';
 
 @Module({
   imports: [],
