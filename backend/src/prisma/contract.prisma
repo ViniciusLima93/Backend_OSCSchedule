@@ -1,14 +1,14 @@
 // use prisma-8
 
-// model User {
-//   id        Int      @id @default(autoincrement())
-//   email     String   @unique
-//   username  String?
-//   name      String?
-//   posts     Post[]
-//   createdAt TimestamptzString @default(now())
-//   updatedAt temporal.updatedAtString()
-// }
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
 
 // model Post {
 //   id        Int      @id @default(autoincrement())

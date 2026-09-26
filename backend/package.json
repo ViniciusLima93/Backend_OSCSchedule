@@ -1,6 +1,5 @@
 {
   "name": "backend_osc",
-  "type": "module",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -25,7 +24,9 @@
     "@nestjs/class-transformer": "^0.4.0",
     "@nestjs/class-validator": "^0.13.4",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^12.0.1",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/orm-postgres": "^8.0.0-rc.12",
     "dotenv": "^18.0.4",
