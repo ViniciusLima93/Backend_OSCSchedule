@@ -1,6 +1,6 @@
-import { Body, Controller,Post } from '@nestjs/common';
-import { ActionService } from './action.service.js';
-import { CreateActionDto } from './dto/create-action.dto.js';
+import { Body, Controller,Get,Post } from '@nestjs/common';
+import { ActionService } from './action.service';
+import { CreateActionDto } from './dto/create-action.dto';
 
 @Controller('action')
 export class ActionController {
@@ -10,5 +10,11 @@ export class ActionController {
     @Post()
     create(@Body() dto: CreateActionDto) {
         return this.actionService.create(dto)
+    }
+
+
+    @Get()
+    findAll() {
+        return this.actionService.findAll()
     }
 }

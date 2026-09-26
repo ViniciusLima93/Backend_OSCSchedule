@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateActionDto } from './dto/create-action.dto.js';
+import { CreateActionDto } from './dto/create-action.dto';
 
-import { db } from '../prisma/db.js';
+import { db } from '../prisma/db';
 
 
 @Injectable()
@@ -20,5 +20,9 @@ export class ActionService {
         
         return action
     }
+
+    async findAll() {
+       return await db.orm.public.Action.all()     
+    } 
 
 }

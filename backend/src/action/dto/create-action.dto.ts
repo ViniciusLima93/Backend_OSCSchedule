@@ -1,4 +1,4 @@
-import { IsDateString, isDateString, IsInt, isObject, IsObject, IsString, Min } from "@nestjs/class-validator";
+import { IsArray, IsDateString, isDateString, IsInt, isObject, IsObject, IsString, Min } from "@nestjs/class-validator";
 
 
 export class CreateActionDto {
@@ -21,7 +21,7 @@ export class CreateActionDto {
 
 
 
-    @IsObject({ message: "Documentos inválidos!" })
+    @IsArray({ message: "Documentos inválidos!" })
     docs!: string[]
 
 
