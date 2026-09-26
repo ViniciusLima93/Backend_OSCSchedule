@@ -1,24 +1,20 @@
-import { IsEmail, IsIn, MinLength } from "@nestjs/class-validator";
+import { IsEmail, IsIn, IsString, MinLength } from 'class-validator';
 
-
-
-const ROLES = ['Morador', 'Organizador'] as const;
-
-
+export const ROLES = ['Morador', 'Organizador'] as const;
+export type Role = (typeof ROLES)[number];
 
 export class CreateUserDto {
+  @IsString()
+  @MinLength(1, { message: 'Nome é obrigatório' })
+  name!: string;
 
-    @MinLength(1,{message:'Nome é obrigatório'})
-    name!: string;
+  @IsEmail({}, { message: 'E-mail inválido' })
+  email!: string;
 
-    @IsEmail()
-    email!:string;
+  @IsString()
+  @MinLength(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+  password!: string;
 
-    @MinLength(8, {message:'A senha deve ter pelo menos 8 caracteres'})
-    password!: string;
-
-    
-    @IsIn(ROLES, {message: 'Função Inválida'})
-    role!:(typeof ROLES)[number]
-
+  @IsIn(ROLES, { message: 'Função inválida (use Morador ou Organizador)' })
+  role!: Role;
 }
