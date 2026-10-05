@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Com o programa completo, o metadata dos decorators referencia as classes
+    // diretamente, sem os guards `typeof X === "undefined"` que geram branches falsos na cobertura
+    "isolatedModules": false,
+    "types": ["node", "jest"]
+  }
+}

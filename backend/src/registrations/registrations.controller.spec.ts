@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ActionsController } from './actions.controller';
-import { ActionsService } from './actions.service';
+import { RegistrationsController } from './registrations.controller';
+import { RegistrationsService } from './registrations.service';
 
 jest.mock('../prisma/db');
 
-describe('ActionsController', () => {
-  let controller: ActionsController;
+describe('RegistrationsController', () => {
+  let controller: RegistrationsController;
   const service = {
     create: jest.fn(),
     findAll: jest.fn(),
     findOne: jest.fn(),
-    update: jest.fn(),
+    cancel: jest.fn(),
     remove: jest.fn(),
   };
 
@@ -18,33 +18,26 @@ describe('ActionsController', () => {
     jest.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [ActionsController],
-      providers: [{ provide: ActionsService, useValue: service }],
+      controllers: [RegistrationsController],
+      providers: [{ provide: RegistrationsService, useValue: service }],
     }).compile();
 
-    controller = module.get<ActionsController>(ActionsController);
+    controller = module.get<RegistrationsController>(RegistrationsController);
   });
 
   it('create delega ao serviço', async () => {
-    const dto = {
-      organizerId: 1,
-      title: 'Mutirão',
-      description: 'Limpeza da praça',
-      location: 'Praça Central',
-      eventDate: '2030-01-01T10:00:00.000Z',
-      vacancies: 10,
-    };
+    const dto = { userId: 1, actionId: 2 };
     service.create.mockResolvedValue({ id: 1 });
 
     await expect(controller.create(dto)).resolves.toEqual({ id: 1 });
     expect(service.create).toHaveBeenCalledWith(dto);
   });
 
-  it('findAll delega ao serviço', async () => {
+  it('findAll delega ao serviço com os filtros', async () => {
     service.findAll.mockResolvedValue([]);
 
-    await expect(controller.findAll()).resolves.toEqual([]);
-    expect(service.findAll).toHaveBeenCalled();
+    await expect(controller.findAll({ userId: 1 })).resolves.toEqual([]);
+    expect(service.findAll).toHaveBeenCalledWith({ userId: 1 });
   });
 
   it('findOne delega ao serviço', async () => {
@@ -54,14 +47,14 @@ describe('ActionsController', () => {
     expect(service.findOne).toHaveBeenCalledWith(1);
   });
 
-  it('update delega ao serviço', async () => {
-    service.update.mockResolvedValue({ id: 1, vacancies: 5 });
+  it('cancel delega ao serviço', async () => {
+    service.cancel.mockResolvedValue({ id: 1, status: 'cancelada' });
 
-    await expect(controller.update(1, { vacancies: 5 })).resolves.toEqual({
+    await expect(controller.cancel(1)).resolves.toEqual({
       id: 1,
-      vacancies: 5,
+      status: 'cancelada',
     });
-    expect(service.update).toHaveBeenCalledWith(1, { vacancies: 5 });
+    expect(service.cancel).toHaveBeenCalledWith(1);
   });
 
   it('remove delega ao serviço', async () => {
